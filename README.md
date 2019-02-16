@@ -1,4 +1,22 @@
 
+# How to run
+Install packages
+```
+pip install -r requirements.txt
+```
+Copy the data and code on CSAIL server
+```
+cp /data/rsg/nlp/zhijing/proj/temp/char-cnn-text-classification-pytorch .
+```
+Run the Prediction codes.
+```
+CUDA_VISIBLE_DEVICES='0' python predict.py
+```
+
+## Message:
+In order to use the interface, just check out `predict.py`.
+
+# The following is for Zhijing's Use (to train the model)
 ### Obtain Data
 ```
 # data is at: https://drive.google.com/drive/folders/0Bz8a_Dbh9Qhbfll6bVpmNUtUcFdjYmF2SEpmZUZUcVNiMUw1TWN6RDV3a0JHT3kxLVhVR2M
