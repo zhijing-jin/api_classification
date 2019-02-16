@@ -1,4 +1,5 @@
 import csv
+import sys
 import os.path as op
 import re
 import torch
@@ -35,15 +36,28 @@ class AGNEWs(Dataset):
         return X, y
 
     def load(self, label_n_txt=None, lowercase=True):
+
         self.label = []
         self.data = []
         if label_n_txt is None:
 
             with open(self.label_data_path, 'r') as f:
                 rdr = csv.reader(f, delimiter=',', quotechar='"')
-                # num_samples = sum(1 for row in rdr)
-                for index, row in enumerate(rdr):
-                    self.label.append(int(row[0]))
+                try:
+                    content = [row for row in rdr]
+                except csv.Error:
+                    csv.field_size_limit(sys.maxsize)
+                    content = [row for row in rdr]
+
+                # num_samples = len(content)
+
+                for row in content:
+                    try:
+                        lbl = int(row[0])
+                    except ValueError:
+                        continue
+
+                    self.label.append(lbl)
                     txt = ' '.join(row[1:])
                     if lowercase:
                         txt = txt.lower()
@@ -60,7 +74,7 @@ class AGNEWs(Dataset):
         # X = (batch, 70, sequence_length)
         X = torch.zeros(len(self.alphabet), self.l0)
         sequence = self.data[idx]
-        for index_char, char in enumerate(sequence[::-1]):
+        for index_char, char in zip(range(self.l0), sequence[::-1]):
             if self.char2Index(char) != -1:
                 X[self.char2Index(char)][index_char] = 1.0
         return X

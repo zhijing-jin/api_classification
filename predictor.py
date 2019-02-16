@@ -20,7 +20,6 @@ def get_args():
     parser.add_argument('--model_path', default=None,
                         help='Path to pre-trained acouctics model created by DeepSpeech training')
     parser.add_argument('--dropout', type=float, default=0.5, help='the probability for dropout [default: 0.5]')
-    parser.add_argument('--l0', type=int, default=1014, help='maximum length of input sequence to CNNs [default: 1014]')
     parser.add_argument('--kernel_num', type=int, default=100, help='number of each kind of kernel')
     parser.add_argument('--channel_size', type=int, default=256, help='size of channels')
     parser.add_argument('--pool_size', type=int, default=3, help='size of channels')
@@ -43,12 +42,11 @@ def get_args():
 
 
 class Predictor(object):
-    def __init__(self, cuda=True, alphabet_path='alphabet.json', l0=1014, batch_size=20, num_workers=4,
+    def __init__(self, cuda=True, alphabet_path='alphabet.json', batch_size=20, num_workers=4,
                  model_path=None, kernel_sizes=[7, 7, 3, 3, 3, 3],
                  channel_size=256, pool_size=3, fc_size=1024, dropout=0.5):
         self.cuda = cuda
         self.alphabet_path = alphabet_path
-        self.l0 = l0
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.model_path = model_path
@@ -80,6 +78,7 @@ class Predictor(object):
         model.eval()
         self.model = model
         self.n_char = checkpoint['n_char']
+        self.l0 = checkpoint['max_seq_len']
 
     def _get_data(self, test_path, alphabet_path, l0, label_n_txt=None):
         # load testing data
@@ -144,7 +143,7 @@ class Predictor(object):
 
 if __name__ == '__main__':
     args = get_args()
-    predictor = Predictor(cuda=args.cuda, alphabet_path=args.alphabet_path, l0=args.l0,
+    predictor = Predictor(cuda=args.cuda, alphabet_path=args.alphabet_path,
                           batch_size=args.batch_size, num_workers=args.num_workers,
                           model_path=args.model_path, kernel_sizes=args.kernel_sizes,
                           channel_size=args.channel_size, pool_size=args.pool_size,

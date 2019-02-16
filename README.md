@@ -30,22 +30,39 @@ cd ..
 ### Run
 ```
 cd /data/rsg/nlp/zhijing/proj/temp/char-cnn-text-classification-pytorch
-CUDA_VISIBLE_DEVICES='1' python train.py --cuda \
---save_folder model_ag \
+CUDA_VISIBLE_DEVICES='0' python train.py --cuda \
+--save_folder model_temp \
 --checkpoint_per_batch 10
 
---train_path data/yelp_review_polarity_csv/train.csv \
---val_path data/yelp_review_polarity_csv/test.csv --l0 1052
+cd /data/rsg/nlp/zhijing/proj/temp/char-cnn-text-classification-pytorch
+CUDA_VISIBLE_DEVICES='0' python -m pdb -c continue train.py \
+--cuda \
+--save_folder model_fake \
+--train_path data/fake_news/train.csv \
+--val_path data/fake_news/test.csv --l0 10000
 
+
+--train_path data/yelp_review_polarity_csv/train.csv \
+--val_path data/yelp_review_polarity_csv/test.csv --l0 5300
+
+# ag_news
 python predictor.py --test_path='data/ag_news_csv/test.csv' \
 --model_path='model_ag/CharCNN_best.pth.tar'
+
+# yelp
+python predictor.py --test_path='data/yelp_review_polarity_csv/test.csv' \
+--model_path='model_yelp/CharCNN_epoch_1.pth.tar'
 
 --model_path=model_temp/CharCNN_epoch_1.pth.tar
 ```
 
+### Work done on 20190216
 - debugged code for Yelp dataset
 - changed the interface import order
 - debugged pytorch version incompatibility
+- downloaded fake_news dataset
+- preprocessed fake_news dataset
+- debugged data_loading for fake_news dataset
 
 ### Acknowledgement
 The code is adapted from https://github.com/srviest/char-cnn-text-classification-pytorch
