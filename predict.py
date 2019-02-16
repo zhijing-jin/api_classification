@@ -15,6 +15,9 @@ if __name__ == '__main__':
                  model_path=model_path, kernel_sizes=[7, 7, 3, 3, 3, 3],
                  channel_size=256, pool_size=3, fc_size=1024, dropout=0.5)
 
-    prob = predictor.pred(test_path, label_n_txt=label_n_txt)
+    # if you want to test out `label_n_txt`, just put None for test_path
+    prob = predictor.pred(None, label_n_txt=label_n_txt)
+
+    # if you want to test out the file in `test_path`, just put None for label_n_txt
     prob = predictor.pred(test_path, label_n_txt=None)
 

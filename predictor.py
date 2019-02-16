@@ -81,10 +81,10 @@ class Predictor(object):
         self.model = model
         self.n_char = checkpoint['n_char']
 
-    def _get_data(self, label_data_path, alphabet_path, l0, label_n_txt=None):
+    def _get_data(self, test_path, alphabet_path, l0, label_n_txt=None):
         # load testing data
         print("\nLoading testing data...")
-        test_dataset = AGNEWs(label_data_path=label_data_path, alphabet_path=alphabet_path,
+        test_dataset = AGNEWs(label_data_path=test_path, alphabet_path=alphabet_path,
                               l0=l0, label_n_txt=label_n_txt)
         print("Transferring testing data to iterator...")
         test_loader = DataLoader(test_dataset, batch_size=self.batch_size, num_workers=self.num_workers, drop_last=True)
@@ -97,8 +97,8 @@ class Predictor(object):
         assert self.n_char == len(test_dataset.alphabet)
         return test_loader
 
-    def pred(self, label_data_path, label_n_txt=None):
-        test_loader = self._get_data(label_data_path, self.alphabet_path, self.l0, label_n_txt=label_n_txt)
+    def pred(self, test_path=None, label_n_txt=None):
+        test_loader = self._get_data(test_path, self.alphabet_path, self.l0, label_n_txt=label_n_txt)
 
         corrects, avg_loss, accumulated_loss, size = 0, 0, 0, 0
         predicates_all, target_all, prob_all = [], [], []
