@@ -3,14 +3,14 @@ import argparse
 import sys
 import numpy as np
 
-from model import CharCNN
-from data_loader import AGNEWs
+from charcnn.model import CharCNN
+from charcnn.data_loader import AGNEWs
 from torch.utils.data import DataLoader
 import torch
 from torch import nn
 from torch.autograd import Variable
 import torch.nn.functional as F
-from metric import print_f_score
+from charcnn.metric import print_f_score
 
 
 def get_args():
@@ -28,21 +28,21 @@ def get_args():
                         help='space-separated kernel sizes to use for convolution')
     # data
     parser.add_argument('--test_path', metavar='DIR',
-                        help='path to testing data csv', default='data/ag_news_csv/test.csv')
+                        help='path to testing data csv', default='charcnn/data/ag_news_csv/test.csv')
     parser.add_argument('--batch_size', type=int, default=20, help='batch size for training [default: 128]')
-    parser.add_argument('--alphabet_path', default='alphabet.json', help='Contains all characters for prediction')
+    parser.add_argument('--alphabet_path', default='charcnn/alphabet.json', help='Contains all characters for prediction')
     # device
     parser.add_argument('--num_workers', default=4, type=int, help='Number of workers used in data-loading')
     parser.add_argument('--cuda', action='store_true', default=True, help='enable the gpu')
     # logging options
-    parser.add_argument('--save_folder', default='Results/', help='Location to save epoch models')
+    parser.add_argument('--save_folder', default='charcnn/Results/', help='Location to save epoch models')
 
     args = parser.parse_args()
     return args
 
 
-class Predictor(object):
-    def __init__(self, cuda=True, alphabet_path='alphabet.json', batch_size=20, num_workers=4,
+class Predictor_charcnn(object):
+    def __init__(self, cuda=True, alphabet_path='charcnn/alphabet.json', batch_size=20, num_workers=4,
                  model_path=None, kernel_sizes=[7, 7, 3, 3, 3, 3],
                  channel_size=256, pool_size=3, fc_size=1024, dropout=0.5):
         self.cuda = cuda
@@ -123,7 +123,7 @@ class Predictor(object):
                                                                          corrects,
                                                                          size))
         print_f_score(predicates_all, target_all)
-        return prob_all
+        return prob_all.numpy()
 
     def pred_batch(self, inputs, target):
         if self.cuda:
@@ -143,9 +143,9 @@ class Predictor(object):
 
 if __name__ == '__main__':
     args = get_args()
-    predictor = Predictor(cuda=args.cuda, alphabet_path=args.alphabet_path,
-                          batch_size=args.batch_size, num_workers=args.num_workers,
-                          model_path=args.model_path, kernel_sizes=args.kernel_sizes,
-                          channel_size=args.channel_size, pool_size=args.pool_size,
-                          fc_size=args.fc_size, dropout=args.dropout)
+    predictor = Predictor_charcnn(cuda=args.cuda, alphabet_path=args.alphabet_path,
+                                  batch_size=args.batch_size, num_workers=args.num_workers,
+                                  model_path=args.model_path, kernel_sizes=args.kernel_sizes,
+                                  channel_size=args.channel_size, pool_size=args.pool_size,
+                                  fc_size=args.fc_size, dropout=args.dropout)
     prob = predictor.pred(args.test_path, None)

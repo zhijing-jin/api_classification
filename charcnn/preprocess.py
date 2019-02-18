@@ -2,6 +2,23 @@ import csv
 import sys
 import random
 
+def read_mr():
+    contents = []
+    for ix, pos_neg in enumerate(['pos', 'neg']):
+        file = 'data/mr/rt-polarity.{}'.format(pos_neg)
+        with open(file) as f:
+            contents += [[str(ix), row] for row in f]
+
+
+    file = 'data/mr/train.csv'
+
+    with open(file, mode='w') as f:
+        writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for row in contents:
+            writer.writerow(row)
+
+
+
 def read_fakenews():
     csv.field_size_limit(sys.maxsize)
     n_test = 1000
