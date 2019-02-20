@@ -20,7 +20,7 @@ In order to use the interface, just check out `predict.py`.
 | | MR| AG | Fake| Yelp|  
 |---|---|---|---|---|
 |Fasttext| 72.7|91.4|99.4|93.7|
-|CharCNN| |89.0|98.0||
+|CharCNN| 70.0|89.0|98.0||
 
 # The following is for Zhijing's Use (to train the model)
 ### Obtain Data
@@ -86,6 +86,20 @@ python predictor.py --test_path='data/yelp/test.csv' \
 python predictor.py --test_path='data/fake/test.csv' \
 --model_path='charcnn/model_fake/CharCNN_best.pth.tar'
 
+# ag_news
+python predictor_charcnn.py --test_path='data/ag/test_tok.csv' \
+--model_path='charcnn/model_ag_tok/CharCNN_best.pth.tar'
+
+# yelp
+python predictor_charcnn.py --test_path='data/yelp/test_tok.csv' \
+--model_path='charcnn/model_yelp_tok/CharCNN_epoch_1.pth.tar'
+
+# fake_news
+python predictor_charcnn.py --test_path='data/fake/test_tok.csv' \
+--model_path='charcnn/model_fake_tok/CharCNN_best.pth.tar'
+# mr
+python predictor_charcnn.py --test_path='data/mr/test_tok.csv' \
+--model_path='charcnn/model_mr_tok/CharCNN_best.pth.tar'
 ```
 
 ### fasttext
