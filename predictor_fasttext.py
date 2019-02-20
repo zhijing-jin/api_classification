@@ -2,6 +2,15 @@ import numpy as np
 from efficiency.function import shell
 from efficiency.log import fwrite
 
+import spacy
+
+def _tokenize(nlp, sent_str, lowercase=True):
+    doc = nlp(sent_str, disable=['parser', 'tagger', 'ner'])
+    s = ' '.join([token.text for token in doc])
+    if lowercase:
+        s = s.lower()
+    return s
+
 
 class Predictor_fasttext:
     def __init__(self, model_path='fasttext/model_yelp.bin'):
@@ -14,6 +23,8 @@ class Predictor_fasttext:
         self.test_path_default = '{}/temp_test.txt'.format(self.model_name)
         self.lbl_pref = '__label__'
 
+        self.nlp = spacy.load('en')
+
 
     def pred(self, test_path=None, label_n_txt=None, lowercase=True):
         if label_n_txt is not None:
@@ -21,8 +32,8 @@ class Predictor_fasttext:
             self.label, self.data = list(zip(*label_n_txt))
             self.data = [txt.lower() if lowercase else txt for txt in self.data]
 
-            writeout = ['{}{} {}\n'.format(self.lbl_pref, *row)
-                        for row in zip(self.label, self.data)]
+            writeout = ['{}{} {}\n'.format(self.lbl_pref, lbl, _tokenize(self.nlp, dat))
+                        for lbl, dat in zip(self.label, self.data)]
             fwrite(''.join(writeout), test_path)
 
         self.n_lbl = self._get_n_lbl(test_path)

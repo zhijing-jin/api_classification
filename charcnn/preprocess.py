@@ -1,22 +1,66 @@
+from __future__ import division
 import csv
 import sys
 import random
 
+
 def read_mr():
     contents = []
-    for ix, pos_neg in enumerate(['pos', 'neg']):
-        file = 'data/mr/rt-polarity.{}'.format(pos_neg)
-        with open(file) as f:
-            contents += [[str(ix), row] for row in f]
+    for ix, pos_neg in enumerate(['neg', 'pos']):
+        file = '../data/mr/rt-polarity.{}'.format(pos_neg)
+        with open(file, 'rb') as f:
+            contents += [[str(ix + 1), row] for row in f]
+
+    split_len = len(contents) // 10
+    random.shuffle(contents)
+    splits = (contents[:-split_len], contents[-split_len:])
+
+    for split, train_test in zip(splits, ['train', 'test']):
+        file = '../data/mr/{}.csv'.format(train_test)
+
+        with open(file, mode='w') as f:
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for row in split:
+                writer.writerow(row)
+            print('[Info] Written {} lines into {}'.format(len(split), file))
 
 
-    file = 'data/mr/train.csv'
+def save_tok():
+    csv.field_size_limit(sys.maxsize)
 
-    with open(file, mode='w') as f:
-        writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for row in contents:
-            writer.writerow(row)
+    import spacy
+    nlp = spacy.load('en')
 
+    folders = ['ag', 'fake', 'yelp', 'mr']
+    folders = ['mr']
+    train_tests = ['train', 'test']
+
+    for train_test in train_tests:
+        for fol in folders:
+            file = '../data/{}/{}.csv'.format(fol, train_test)
+            file_tok = '../data/{}/{}_tok.csv'.format(fol, train_test)
+
+            with open(file) as csvfile:
+                reader = csv.reader(csvfile, delimiter=',')
+                contents = [(row[0], ' '.join(row[1:]))
+                            for row in reader]
+                print(f'[Info] Obtained {len(contents)} lines from CSV file {file}.')
+
+            contents = [(row[0], tokenize(nlp, row[1])) for row in contents]
+
+            with open(file_tok, mode='w') as f:
+                writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                for row in contents:
+                    writer.writerow(row)
+            print('[Info] Written {} lines into {}'.format(len(contents), file_tok))
+
+
+def tokenize(nlp, sent_str, lowercase=True):
+    doc = nlp(sent_str, disable=['parser', 'tagger', 'ner'])
+    s = ' '.join([token.text for token in doc])
+    if lowercase:
+        s = s.lower()
+    return s
 
 
 def read_fakenews():
@@ -49,7 +93,6 @@ def read_fakenews():
     random.shuffle(test)
 
     def _writecsv(file, dic_list):
-
         with open(file, mode='w') as f:
             writer = csv.DictWriter(f, fieldnames=fields)
 
@@ -63,7 +106,5 @@ def read_fakenews():
     _writecsv('data/fake_news/test.csv', test)
 
 
-
-
-
-read_fakenews()
+read_mr()
+save_tok()

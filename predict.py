@@ -4,7 +4,7 @@ from predictor_fasttext import Predictor_fasttext
 
 def get_prediction(model, dataset, label_n_txt=None):
     model_path_format = {
-        'fasttext': '{}/model_{}.bin',
+        'fasttext': '{}/model_{}_tok.bin',
         'charcnn': '{}/model_{}/CharCNN_best.pth.tar'
     }
     model_path = model_path_format[model].format(model, dataset)

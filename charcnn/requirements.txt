@@ -1,1 +1,5 @@
+spacy
 termcolor
+# python -m spacy download en
+
+git+git://github.com/zhijing-jin/efficiency.git
