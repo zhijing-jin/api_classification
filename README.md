@@ -20,7 +20,7 @@ CUDA_VISIBLE_DEVICES='0' python run_ppl.py
 ```
 
 ## How to use
-get perplexity
+Get perplexity
 ```python
 from run_ppl import LM
 lm = LM()
@@ -29,7 +29,7 @@ ppl = lm.get_ppl(sentence, printout=True)
 
 ```
 
-get classifier result
+Get classifier result
 ```python
 from run_clf import get_clf_pred
 model = 'fasttext'  # ['charcnn', 'fasttext']
@@ -48,7 +48,14 @@ preds = get_clf_pred(model, dataset, label_n_txt=label_n_txt)
 # if you want to test out the file in `test_path`, just put None for label_n_txt.
 # if you put '' in test_path, it will use the default test_path 'data/{}/test{}.txt'
 preds = get_clf_pred(model, dataset, label_n_txt=None, test_path='')
-    
+```
+
+Use tokenizer
+```python
+from charcnn.preprocess import Tokenizer
+sent = "Here's your coffee."
+tokenizer = Tokenizer()
+tokenizer.tokenize(sent)
 ```
 
 ## Message:
@@ -76,7 +83,8 @@ cd ..
 ### Run
 Bert for classification
 ```python
-# check https://github.com/kaushaltrivedi/bert-toxic-comments-multilabel/blob/master/toxic-bert-multilabel-classification.ipynb
+# Multilabel: https://github.com/kaushaltrivedi/bert-toxic-comments-multilabel/blob/master/toxic-bert-multilabel-classification.ipynb
+# Sentence Pair Classification https://gluon-nlp.mxnet.io/examples/sentence_embedding/bert.html
 ```
 
 ```

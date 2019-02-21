@@ -2,7 +2,7 @@ from __future__ import division
 import csv
 import sys
 import random
-
+from efficiency.log import fwrite
 
 def read_mr():
     contents = []
@@ -25,20 +25,20 @@ def read_mr():
             print('[Info] Written {} lines into {}'.format(len(split), file))
 
 
-def save_tok():
+def save_tok(tok_files=False, lm_files=True):
+
     csv.field_size_limit(sys.maxsize)
 
-    import spacy
-    nlp = spacy.load('en')
+    tokenizer = Tokenizer()
 
     folders = ['ag', 'fake', 'yelp', 'mr']
-    folders = ['mr']
     train_tests = ['train', 'test']
 
     for train_test in train_tests:
         for fol in folders:
             file = '../data/{}/{}.csv'.format(fol, train_test)
             file_tok = '../data/{}/{}_tok.csv'.format(fol, train_test)
+            file_lm = '../data/{}/{}_lm.txt'.format(fol, train_test)
 
             with open(file) as csvfile:
                 reader = csv.reader(csvfile, delimiter=',')
@@ -46,21 +46,31 @@ def save_tok():
                             for row in reader]
                 print(f'[Info] Obtained {len(contents)} lines from CSV file {file}.')
 
-            contents = [(row[0], tokenize(nlp, row[1])) for row in contents]
+            contents = [(row[0], tokenizer.tokenize(row[1])) for row in contents]
+            if lm_files:
+                texts = [row[1] + '\n' for row in contents]
+                fwrite(''.join(texts), file_lm)
+                print('[Info] Written {} lines into {}'.format(len(texts), file_lm))
+                print('[Info] last line: {}'.format(texts[-1]))
 
-            with open(file_tok, mode='w') as f:
-                writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                for row in contents:
-                    writer.writerow(row)
-            print('[Info] Written {} lines into {}'.format(len(contents), file_tok))
+            if tok_files:
+                with open(file_tok, mode='w') as f:
+                    writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    for row in contents:
+                        writer.writerow(row)
+                print('[Info] Written {} lines into {}'.format(len(contents), file_tok))
 
+class Tokenizer():
+    def __init__(self):
+        import spacy
+        self.nlp = spacy.load('en')
 
-def tokenize(nlp, sent_str, lowercase=True):
-    doc = nlp(sent_str, disable=['parser', 'tagger', 'ner'])
-    s = ' '.join([token.text for token in doc])
-    if lowercase:
-        s = s.lower()
-    return s
+    def tokenize(self, sent_str, lowercase=True):
+        doc = nlp(sent_str, disable=['parser', 'tagger', 'ner'])
+        s = ' '.join([token.text for token in doc])
+        if lowercase:
+            s = s.lower()
+        return s
 
 
 def read_fakenews():
@@ -105,6 +115,5 @@ def read_fakenews():
     _writecsv('data/fake_news/train.csv', train)
     _writecsv('data/fake_news/test.csv', test)
 
-
-read_mr()
-save_tok()
+if __name__ == "__main__":
+    save_tok()

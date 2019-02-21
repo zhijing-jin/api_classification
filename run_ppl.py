@@ -68,6 +68,18 @@ class LM(nn.Module):
             ppl = self.get_score(raw_text)
             print("[Info] ppl: {:.2f}".format(ppl))
 
+    def get_dataset_ppl(self, file, printout=''):
+        with open(file, 'rb') as f:
+            data = [str(line.strip()) for line in f if line.strip()]
+        ppl_list = []
+        for line in data:
+            ppl = self.get_ppl(line)
+            ppl_list.append(ppl)
+        ppl = np.array(ppl_list).mean()
+        if printout:
+            print("[Info] {} Dataset ppl: {:.2f}".format(printout, ppl))
+        return
+
     def get_ppl(self, sentence, printout=False):
         tokens = self.tokenizer.tokenize(sentence)
         tokens = tokens[:self.max_seq_length]
@@ -89,6 +101,10 @@ def main():
     lm = LM()
     sentence = 'it is a beautiful day'
     ppl = lm.get_ppl(sentence, printout=True)
+    for dataset in ['ag', 'fake', 'yelp', 'mr']:
+        file = 'data/{}/train_lm.txt'.format(dataset)
+        ppl_list = lm.get_dataset_ppl(file, printout=dataset)
+        import pdb; pdb.set_trace()
 
 
 if __name__ == "__main__":
