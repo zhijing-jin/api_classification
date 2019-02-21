@@ -10,17 +10,54 @@ cp -a /data/rsg/nlp/zhijing/proj/1902attack .
 ```
 Run the Prediction codes.
 ```
-CUDA_VISIBLE_DEVICES='0' python predict.py
+CUDA_VISIBLE_DEVICES='0' python run_clf.py
+```
+Run the LM to get perplexity of a sentence.
+```
+CUDA_VISIBLE_DEVICES='0' python run_ppl.py
 ```
 
+## How to use
+get perplexity
+```python
+from run_ppl import LM
+lm = LM()
+sentence = 'it is a beautiful day'
+ppl = lm.get_ppl(sentence, printout=True)
+
+```
+
+get classifier result
+```python
+from run_clf import get_clf_pred
+model = 'fasttext'  # ['charcnn', 'fasttext']
+dataset = 'ag'  # ['fake', 'yelp', 'ag']
+
+label_n_txt = [(2, 'this is on sports'),
+               (1, 'this is on music'),
+               (3,
+                "E-mail scam targets police chief Wiltshire Police warns about ""phishing"" after its fraud squad chief was targeted."),
+               (4,
+                "Card fraud unit nets 36,000 cards In its first two years, the UK's dedicated card fraud unit, has recovered 36,000 stolen cards and 171 arrests - and estimates it saved 65m.")]
+
+# if you want to test out `label_n_txt`, just put a list for label_n_txt
+preds = get_clf_pred(model, dataset, label_n_txt=label_n_txt)
+
+# if you want to test out the file in `test_path`, just put None for label_n_txt.
+# if you put '' in test_path, it will use the default test_path 'data/{}/test{}.txt'
+preds = get_clf_pred(model, dataset, label_n_txt=None, test_path='')
+    
+```
 ## Message:
-In order to use the interface, just check out `predict.py`.
+In order to use the interface, just check out `run_clf.py`.
 
 ## Ready-To-Use Models
 | | MR| AG | Fake| Yelp|  
 |---|---|---|---|---|
 |Fasttext| 72.7|91.4|99.4|93.7|
 |CharCNN| 70.0|89.0|98.0|93.0|
+
+
 
 # The following is for Zhijing's Use (to train the model)
 ### Obtain Data
@@ -150,9 +187,9 @@ cd /data/rsg/nlp/zhijing/proj/1902attack/fasttext
 
 ```
 
-### Work done on 20190218
-- coded the interface for fasttext
-- restructured folders
+### Work done on 20190221
+- coded the interface for bert LM
+- adapted bert for perplexity scores
 
 ### Acknowledgement
 The code for charcnn is adapted from https://github.com/srviest/char-cnn-text-classification-pytorch
