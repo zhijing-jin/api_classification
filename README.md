@@ -3,7 +3,8 @@
 Install packages (Python=3)
 ```
 pip install -r charcnn/requirements.txt
-pip install
+pip install pytorch-pretrained-bert
+pip install spacy ftfy==4.4.3
 ```
 Copy the data and code on CSAIL server
 ```
@@ -49,6 +50,7 @@ preds = get_clf_pred(model, dataset, label_n_txt=label_n_txt)
 preds = get_clf_pred(model, dataset, label_n_txt=None, test_path='')
     
 ```
+
 ## Message:
 In order to use the interface, just check out `run_clf.py`.
 
@@ -72,6 +74,11 @@ cd ..
 ```
 
 ### Run
+Bert for classification
+```python
+# check https://github.com/kaushaltrivedi/bert-toxic-comments-multilabel/blob/master/toxic-bert-multilabel-classification.ipynb
+```
+
 ```
 # without _tok, the result is higher
 cd /data/rsg/nlp/zhijing/proj/temp/charcnn
