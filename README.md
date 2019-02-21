@@ -3,6 +3,7 @@
 Install packages (Python=3)
 ```
 pip install -r charcnn/requirements.txt
+pip install
 ```
 Copy the data and code on CSAIL server
 ```
