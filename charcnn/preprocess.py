@@ -4,6 +4,7 @@ import sys
 import random
 from efficiency.log import fwrite
 
+
 def read_mr():
     contents = []
     for ix, pos_neg in enumerate(['neg', 'pos']):
@@ -26,7 +27,6 @@ def read_mr():
 
 
 def save_tok(tok_files=False, lm_files=True):
-
     csv.field_size_limit(sys.maxsize)
 
     tokenizer = Tokenizer()
@@ -60,13 +60,14 @@ def save_tok(tok_files=False, lm_files=True):
                         writer.writerow(row)
                 print('[Info] Written {} lines into {}'.format(len(contents), file_tok))
 
+
 class Tokenizer():
     def __init__(self):
         import spacy
         self.nlp = spacy.load('en')
 
     def tokenize(self, sent_str, lowercase=True):
-        doc = nlp(sent_str, disable=['parser', 'tagger', 'ner'])
+        doc = self.nlp(sent_str, disable=['parser', 'tagger', 'ner'])
         s = ' '.join([token.text for token in doc])
         if lowercase:
             s = s.lower()
@@ -114,6 +115,7 @@ def read_fakenews():
 
     _writecsv('data/fake_news/train.csv', train)
     _writecsv('data/fake_news/test.csv', test)
+
 
 if __name__ == "__main__":
     save_tok()

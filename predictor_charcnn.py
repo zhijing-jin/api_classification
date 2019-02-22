@@ -30,7 +30,8 @@ def get_args():
     parser.add_argument('--test_path', metavar='DIR',
                         help='path to testing data csv', default='charcnn/data/ag_news_csv/test.csv')
     parser.add_argument('--batch_size', type=int, default=20, help='batch size for training [default: 128]')
-    parser.add_argument('--alphabet_path', default='charcnn/alphabet.json', help='Contains all characters for prediction')
+    parser.add_argument('--alphabet_path', default='charcnn/alphabet.json',
+                        help='Contains all characters for prediction')
     # device
     parser.add_argument('--num_workers', default=4, type=int, help='Number of workers used in data-loading')
     parser.add_argument('--cuda', action='store_true', default=True, help='enable the gpu')
@@ -44,7 +45,7 @@ def get_args():
 class Predictor_charcnn(object):
     def __init__(self, cuda=True, alphabet_path='charcnn/alphabet.json', batch_size=20, num_workers=4,
                  model_path=None, kernel_sizes=[7, 7, 3, 3, 3, 3],
-                 channel_size=256, pool_size=3, fc_size=1024, dropout=0.5):
+                 channel_size=256, pool_size=3, fc_size=1024, dropout=0.5, verbose=False):
         self.cuda = cuda
         self.alphabet_path = alphabet_path
         self.batch_size = batch_size
@@ -55,6 +56,7 @@ class Predictor_charcnn(object):
         self.pool_size = pool_size
         self.fc_size = fc_size
         self.dropout = dropout
+        self.verbose = verbose
 
         self._init_model()
 
@@ -82,16 +84,19 @@ class Predictor_charcnn(object):
 
     def _get_data(self, test_path, alphabet_path, l0, label_n_txt=None):
         # load testing data
-        print("\nLoading testing data...")
+        if self.verbose:
+            print("\nLoading testing data...")
         test_dataset = AGNEWs(label_data_path=test_path, alphabet_path=alphabet_path,
                               l0=l0, label_n_txt=label_n_txt)
-        print("Transferring testing data to iterator...")
+        if self.verbose:
+            print("Transferring testing data to iterator...")
         test_loader = DataLoader(test_dataset, batch_size=self.batch_size, num_workers=self.num_workers, drop_last=True)
 
         _, num_class_test = test_dataset.get_class_weight()
-        print('\nNumber of testing samples: ' + str(test_dataset.__len__()))
-        for i, c in enumerate(num_class_test):
-            print("\tLabel {:d}:".format(i).ljust(15) + "{:d}".format(c).rjust(8))
+        if self.verbose:
+            print('\nNumber of testing samples: ' + str(test_dataset.__len__()))
+            for i, c in enumerate(num_class_test):
+                print("\tLabel {:d}:".format(i).ljust(15) + "{:d}".format(c).rjust(8))
 
         assert self.n_char == len(test_dataset.alphabet)
         return test_loader
@@ -101,7 +106,8 @@ class Predictor_charcnn(object):
 
         corrects, avg_loss, accumulated_loss, size = 0, 0, 0, 0
         predicates_all, target_all, prob_all = [], [], []
-        print('\nTesting...')
+        if self.verbose:
+            print('\nTesting...')
         for i_batch, (data) in enumerate(test_loader):
             inputs, target = data
             target.sub_(1)
@@ -118,11 +124,12 @@ class Predictor_charcnn(object):
         prob_all = torch.cat(prob_all, 0)
         avg_loss = accumulated_loss / size
         accuracy = 100.0 * corrects / size
-        print('\rEvaluation - loss: {:.6f}  acc: {:.3f}%({}/{}) '.format(avg_loss,
-                                                                         accuracy,
-                                                                         corrects,
-                                                                         size))
-        print_f_score(predicates_all, target_all)
+        if self.verbose:
+            print('\rEvaluation - loss: {:.6f}  acc: {:.3f}%({}/{}) '.format(avg_loss,
+                                                                             accuracy,
+                                                                             corrects,
+                                                                             size))
+            print_f_score(predicates_all, target_all)
         return prob_all.numpy()
 
     def pred_batch(self, inputs, target):
@@ -136,13 +143,14 @@ class Predictor_charcnn(object):
         predicates = torch.max(logit, 1)[1].view(target.size()).data
         prob = torch.exp(logit)
 
-        loss = F.nll_loss(logit, target, size_average=False).data[0]
+        loss = F.nll_loss(logit, target, size_average=False).item()
         corr = (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
         return prob, predicates, loss, corr
 
 
 if __name__ == '__main__':
     args = get_args()
+
     predictor = Predictor_charcnn(cuda=args.cuda, alphabet_path=args.alphabet_path,
                                   batch_size=args.batch_size, num_workers=args.num_workers,
                                   model_path=args.model_path, kernel_sizes=args.kernel_sizes,

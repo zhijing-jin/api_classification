@@ -39,6 +39,8 @@ class AGNEWs(Dataset):
 
         self.label = []
         self.data = []
+        file = self.label_data_path
+
         if label_n_txt is None:
 
             with open(self.label_data_path, 'r') as f:
@@ -64,6 +66,7 @@ class AGNEWs(Dataset):
                     self.data.append(txt)
         else:
             self.label, self.data = list(zip(*label_n_txt))
+            self.label = list(self.label)
             self.data = [txt.lower() if lowercase else txt for txt in self.data]
 
     def get_num_class(self):

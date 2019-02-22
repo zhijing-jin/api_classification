@@ -4,6 +4,7 @@ from efficiency.log import fwrite
 
 import spacy
 
+
 def _tokenize(nlp, sent_str, lowercase=True):
     doc = nlp(sent_str, disable=['parser', 'tagger', 'ner'])
     s = ' '.join([token.text for token in doc])
@@ -13,7 +14,7 @@ def _tokenize(nlp, sent_str, lowercase=True):
 
 
 class Predictor_fasttext:
-    def __init__(self, model_path='fasttext/model_yelp.bin'):
+    def __init__(self, model_path='fasttext/model_yelp.bin', batch_size=None):
         self.model_name = 'fasttext'
         self.command = '{model_name}/{model_name} predict-prob \
                 {model_path} {{test_path}} {{k_most}}' \
@@ -24,7 +25,6 @@ class Predictor_fasttext:
         self.lbl_pref = '__label__'
 
         self.nlp = spacy.load('en')
-
 
     def pred(self, test_path=None, label_n_txt=None, lowercase=True):
         if label_n_txt is not None:

@@ -5,10 +5,15 @@ Install packages (Python=3)
 pip install -r charcnn/requirements.txt
 pip install pytorch-pretrained-bert
 pip install spacy ftfy==4.4.3
+python -m spacy download en
 ```
 Copy the data and code on CSAIL server
 ```
 cp -a /data/rsg/nlp/zhijing/proj/1902attack .
+```
+If the copying fails, feel free to work in this directory
+```
+cd /afs/csail.mit.edu/u/z/zhijing/proj/1902attack
 ```
 Run the Prediction codes.
 ```
@@ -55,7 +60,7 @@ Use tokenizer
 from charcnn.preprocess import Tokenizer
 sent = "Here's your coffee."
 tokenizer = Tokenizer()
-tokenizer.tokenize(sent)
+tokens = tokenizer.tokenize(sent) # "here 's your coffee ."
 ```
 
 ## Message:
@@ -64,9 +69,13 @@ In order to use the interface, just check out `run_clf.py`.
 ## Ready-To-Use Models
 | | MR| AG | Fake| Yelp|  
 |---|---|---|---|---|
-|Fasttext| 72.7|91.4|99.4|93.7|
-|CharCNN| 70.0|89.0|98.0|93.0|
+|Fasttext| 72.7|91.4 (Paper: 91.5)|99.4|93.7 (Paper: 93.8)|
+|CharCNN| 70.0|89.0 (Paper: 88~91)|98.0|93.0 (Paper: ~95)|
 
+## LM
+| | MR| AG | Fake| Yelp|  
+|---|---|---|---|---|
+|BERT| 2.62|2.40|3.56|1.97|
 
 
 # The following is for Zhijing's Use (to train the model)
